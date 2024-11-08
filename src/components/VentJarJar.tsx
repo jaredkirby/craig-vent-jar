@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { Coins, RotateCcw, History } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useMemo } from "react";
+import { Coins, RotateCcw, History } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const VentJar: React.FC = () => {
   const [amount, setAmount] = useState(0);
@@ -15,19 +15,19 @@ export const VentJar: React.FC = () => {
   // Generate overlapping coin positions from top to bottom
   const coinGrid = useMemo(() => {
     const positions = [];
-    const columns = 5;  // More columns for density
-    const rows = 10;    // More rows to ensure coverage
+    const columns = 5; // More columns for density
+    const rows = 10; // More rows to ensure coverage
     const offsetX = 88; // Percentage for overlap (less than 100)
     const offsetY = 92; // Percentage for vertical overlap
-    
+
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
         positions.push({
-          left: `${(col * offsetX/columns) + (row % 2 ? 8 : 0)}%`,
+          left: `${(col * offsetX) / columns + (row % 2 ? 8 : 0)}%`,
           // Position from top instead of bottom
-          top: `${(row * offsetY/rows)}%`,
+          top: `${(row * offsetY) / rows}%`,
           delay: (row * columns + col) * 30,
-          zIndex: rows - row // Reverse z-index so top coins appear above
+          zIndex: rows - row, // Reverse z-index so top coins appear above
         });
       }
     }
@@ -40,10 +40,12 @@ export const VentJar: React.FC = () => {
 
   const handleVent = () => {
     if (amount < MAX_AMOUNT) {
-      setAmount(prev => Math.min(prev + 1, MAX_AMOUNT));
+      setAmount((prev) => Math.min(prev + 1, MAX_AMOUNT));
       setIsShaking(true);
       const now = new Date().toLocaleTimeString();
-      setRecentVents(prev => [`${now}: Added $1 to the jar`, ...prev].slice(0, 5));
+      setRecentVents((prev) =>
+        [`${now}: Added $1 to the jar`, ...prev].slice(0, 5)
+      );
       setTimeout(() => setIsShaking(false), 500);
     }
   };
@@ -74,48 +76,74 @@ export const VentJar: React.FC = () => {
     <div className="max-w-md mx-auto p-4 mt-8">
       <Card className="bg-transparent shadow-none">
         <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold text-gray-800">
+          <CardTitle className="text-center text-2xl font-bold text-gray-800 mb-4">
             Craig's Venting Jar
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Jar Container */}
-          <div className={`relative mx-auto ${isShaking ? 'animate-shake' : ''}`}>
+          <div className={`relative mx-auto ${isShaking ? "animate-shake" : ""}`}>
             {/* Lid */}
-            <div className="relative z-20 mx-auto w-48 h-12 bg-gray-200 rounded-t-full shadow-lg">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-24 h-6 bg-gray-300 rounded-t-full"></div>
+            <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-56 h-8 bg-gradient-to-b from-gray-100 to-gray-200 rounded-t-2xl shadow-md z-20">
+              {/* Simple Threading Pattern */}
+              <div className="absolute top-3 inset-x-8 flex justify-between">
+              {[...Array(4)].map((_, i) => (
+              <div
+              key={i}
+              className="w-6 h-2.5 bg-gray-300/60 rounded-full"
+              ></div>
+              ))}
+              </div>
+              {/* Subtle top highlight */}
+              <div className="absolute top-1 inset-x-4 h-0.5 bg-white/20 rounded-full"></div>
+              {/* Very subtle bottom shadow */}
+              <div className="absolute -bottom-0.5 inset-x-0 h-0.5 bg-black/5 blur-[0.5px]"></div>
             </div>
-            
+
             {/* Jar Body */}
             <div className="relative w-64 h-80 mx-auto">
               {/* Glass Effect Container */}
-              <div className="absolute inset-0 bg-white/30 backdrop-blur-sm rounded-3xl border-2 border-gray-100 overflow-hidden">
-                {/* Left Glass Highlight */}
-                <div className="absolute left-4 top-0 bottom-0 w-12 bg-white/20 blur-sm transform -skew-x-12"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden">
+                {/* Left side shadow */}
+                <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-black/5 via-transparent to-transparent"></div>
                 
-                {/* Coins Container */}
-                <div className="absolute inset-0">
-                  {coinGrid.slice(0, visibleCoins).map((position, index) => (
-                    <div
-                      key={index}
-                      className="absolute w-12 h-12 transition-all duration-500"
-                      style={{
-                        left: position.left,
-                        top: position.top,
-                        transitionDelay: `${position.delay}ms`,
-                        opacity: index < visibleCoins ? 1 : 0,
-                        transform: `translateY(${index < visibleCoins ? '0' : '-100%'})`,
-                        zIndex: position.zIndex,
-                      }}
-                    >
-                      <div className="w-full h-full bg-yellow-400 rounded-full shadow-lg flex items-center justify-center rotate-12">
-                        <div className="w-10 h-10 bg-yellow-300 rounded-full flex items-center justify-center">
-                          <span className="text-yellow-600 text-xs font-bold">$1</span>
+                {/* Right side shadow */}
+                <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black/5 via-transparent to-transparent"></div>
+
+                {/* Subtle Glass Highlights */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/40 to-transparent"></div>
+                <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white/20 to-transparent"></div>
+
+                {/* Top highlight */}
+                <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/50 to-transparent"></div>
+
+                {/* Bottom shadow */}
+                <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black/5 to-transparent"></div>
+                <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/5 to-transparent"></div>
+
+                  {/* Coins Container */}
+                  <div className="absolute inset-0">
+                    {coinGrid.slice(0, visibleCoins).map((position, index) => (
+                      <div
+                        key={index}
+                        className="absolute w-12 h-12 transition-all duration-500"
+                        style={{
+                          left: position.left,
+                          top: position.top,
+                          transitionDelay: `${position.delay}ms`,
+                          opacity: index < visibleCoins ? 1 : 0,
+                          transform: `translateY(${index < visibleCoins ? "0" : "-100%"})`,
+                          zIndex: position.zIndex,
+                        }}
+                      >
+                        <div className="w-full h-full bg-yellow-400 rounded-full shadow-lg flex items-center justify-center rotate-12">
+                          <div className="w-10 h-10 bg-yellow-300 rounded-full flex items-center justify-center">
+                            <span className="text-yellow-600 text-xs font-bold">$1</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
                 {/* Fill Level Indicator */}
                 {percentFull >= 100 && (
@@ -125,27 +153,28 @@ export const VentJar: React.FC = () => {
 
               {/* Amount Display */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="text-5xl font-bold text-gray-800 bg-white/80 px-6 py-3 rounded-2xl backdrop-blur-sm">
+                <div className="text-5xl font-bold text-gray-800 bg-white/90 px-6 py-3 rounded-2xl shadow-sm backdrop-blur-sm">
                   ${amount}
                 </div>
               </div>
             </div>
           </div>
-
           {/* Buttons Container */}
           <div className="flex gap-4 justify-center pt-4">
             <button
               onClick={handleVent}
               disabled={amount >= MAX_AMOUNT}
               className={`bg-blue-500 text-white px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2
-                ${amount >= MAX_AMOUNT 
-                  ? 'opacity-50 cursor-not-allowed' 
-                  : 'hover:bg-blue-600 hover:shadow-lg'}`}
+                ${
+                  amount >= MAX_AMOUNT
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-blue-600 hover:shadow-lg"
+                }`}
             >
               <Coins className="w-5 h-5" />
-              {amount >= MAX_AMOUNT ? 'Jar Full!' : 'Add $1'}
+              {amount >= MAX_AMOUNT ? "Jar Full!" : "Add $1"}
             </button>
-            
+
             <button
               onClick={() => setShowHistory(!showHistory)}
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl transition-colors"
