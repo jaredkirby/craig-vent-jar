@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Jar Body -->
+  <path d="M12 18 L16 8 H48 L52 18 L52 56 C52 58 50 60 48 60 H16 C14 60 12 58 12 56 Z" 
+        fill="none" 
+        stroke="#4B5563" 
+        stroke-width="4"
+        stroke-linejoin="round"/>
+  
+  <!-- Jar Threading -->
+  <path d="M16 8 H48" 
+        stroke="#4B5563" 
+        stroke-width="4" 
+        stroke-linecap="round"/>
+  
+  <!-- Dollar Sign -->
+  <path d="M32 28 C38 28 38 24 32 24 C26 24 26 32 32 32 C38 32 38 40 32 40 C26 40 26 36 32 36 M32 22 V42" 
+        stroke="#3B82F6" 
+        stroke-width="4" 
+        stroke-linecap="round"
+        fill="none"/>
+</svg>
