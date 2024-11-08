@@ -73,8 +73,8 @@ export const VentJar: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 mt-8 relative">
-      <Card className="bg-transparent shadow-none relative z-10">
+    <div className="max-w-md mx-auto p-4 mt-8">
+      <Card className="bg-transparent shadow-none">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold text-gray-800 mb-4">
             Craig's Venting Jar
@@ -84,80 +84,81 @@ export const VentJar: React.FC = () => {
           {/* Jar Container */}
           <div className={`relative mx-auto ${isShaking ? "animate-shake" : ""}`}>
             {/* Lid */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-56 h-8 bg-gradient-to-b from-gray-100 to-gray-200 rounded-t-2xl shadow-md z-10">
+            <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-56 h-8 bg-gradient-to-b from-gray-100 to-gray-200 rounded-t-2xl shadow-md z-20">
               {/* Simple Threading Pattern */}
               <div className="absolute top-3 inset-x-8 flex justify-between">
-                {[...Array(4)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-6 h-2.5 bg-gray-300/60 rounded-full"
-                  ></div>
-                ))}
+              {[...Array(4)].map((_, i) => (
+              <div
+              key={i}
+              className="w-6 h-2.5 bg-gray-300/60 rounded-full"
+              ></div>
+              ))}
               </div>
+              {/* Subtle top highlight */}
               <div className="absolute top-1 inset-x-4 h-0.5 bg-white/20 rounded-full"></div>
+              {/* Very subtle bottom shadow */}
               <div className="absolute -bottom-0.5 inset-x-0 h-0.5 bg-black/5 blur-[0.5px]"></div>
             </div>
 
             {/* Jar Body */}
             <div className="relative w-64 h-80 mx-auto">
-              {/* Glass Effect Base Container */}
+              {/* Glass Effect Container */}
               <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden">
-                {/* Base Glass Highlights - Behind Coins */}
-                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/40 to-transparent z-10"></div>
-                <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white/20 to-transparent z-10"></div>
-                <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/50 to-transparent z-10"></div>
+                {/* Left side shadow */}
+                <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-black/5 via-transparent to-transparent"></div>
+                
+                {/* Right side shadow */}
+                <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black/5 via-transparent to-transparent"></div>
 
-                {/* Coins Container - Middle Layer */}
-                <div className="absolute inset-0 z-20">
-                  {coinGrid.slice(0, visibleCoins).map((position, index) => (
-                    <div
-                      key={index}
-                      className="absolute w-12 h-12 transition-all duration-500"
-                      style={{
-                        left: position.left,
-                        top: position.top,
-                        transitionDelay: `${position.delay}ms`,
-                        opacity: index < visibleCoins ? 1 : 0,
-                        transform: `translateY(${
-                          index < visibleCoins ? "0" : "-100%"
-                        })`,
-                      }}
-                    >
-                      <div className="w-full h-full bg-yellow-400 rounded-full shadow-lg flex items-center justify-center rotate-12">
-                        <div className="w-10 h-10 bg-yellow-300 rounded-full flex items-center justify-center">
-                          <span className="text-yellow-600 text-xs font-bold">$1</span>
+                {/* Subtle Glass Highlights */}
+                <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white/40 to-transparent"></div>
+                <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white/20 to-transparent"></div>
+
+                {/* Top highlight */}
+                <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-white/50 to-transparent"></div>
+
+                {/* Bottom shadow */}
+                <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black/5 to-transparent"></div>
+                <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/5 to-transparent"></div>
+
+                  {/* Coins Container */}
+                  <div className="absolute inset-0">
+                    {coinGrid.slice(0, visibleCoins).map((position, index) => (
+                      <div
+                        key={index}
+                        className="absolute w-12 h-12 transition-all duration-500"
+                        style={{
+                          left: position.left,
+                          top: position.top,
+                          transitionDelay: `${position.delay}ms`,
+                          opacity: index < visibleCoins ? 1 : 0,
+                          transform: `translateY(${index < visibleCoins ? "0" : "-100%"})`,
+                          zIndex: position.zIndex,
+                        }}
+                      >
+                        <div className="w-full h-full bg-yellow-400 rounded-full shadow-lg flex items-center justify-center rotate-12">
+                          <div className="w-10 h-10 bg-yellow-300 rounded-full flex items-center justify-center">
+                            <span className="text-yellow-600 text-xs font-bold">$1</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Shadows Layer - Front Layer */}
-                <div className="absolute inset-0 z-30 pointer-events-none">
-                  {/* Left side shadow */}
-                  <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-black/5 via-transparent to-transparent"></div>
-                  {/* Right side shadow */}
-                  <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-black/5 via-transparent to-transparent"></div>
-                  {/* Bottom shadows */}
-                  <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-black/5 to-transparent"></div>
-                  <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-black/5 to-transparent"></div>
-                </div>
+                    ))}
+                  </div>
 
                 {/* Fill Level Indicator */}
                 {percentFull >= 100 && (
-                  <div className="absolute inset-0 bg-yellow-400/20 animate-pulse z-40" />
+                  <div className="absolute inset-0 bg-yellow-400/20 animate-pulse" />
                 )}
               </div>
 
               {/* Amount Display */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="text-5xl font-bold text-gray-800 bg-white/90 px-6 py-3 rounded-2xl shadow-sm backdrop-blur-sm">
                   ${amount}
                 </div>
               </div>
             </div>
           </div>
-
           {/* Buttons Container */}
           <div className="flex gap-4 justify-center pt-4">
             <button
@@ -209,7 +210,7 @@ export const VentJar: React.FC = () => {
 
           {/* Reset Confirmation Modals */}
           {showResetConfirm && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-50">
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
               <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm mx-4 border-2 border-red-100">
                 <h3 className="text-xl font-bold mb-3 text-gray-900">
                   Reset Venting Jar?
@@ -236,7 +237,7 @@ export const VentJar: React.FC = () => {
           )}
 
           {showFinalConfirm && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm z-50">
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
               <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm mx-4 border-2 border-red-200">
                 <h3 className="text-xl font-bold mb-2 text-red-600">
                   ⚠️ Final Warning!
