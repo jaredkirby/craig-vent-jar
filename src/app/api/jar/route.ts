@@ -5,11 +5,9 @@ import { getRedisClient } from "@/lib/redis";
 export async function GET() {
   try {
     const client = await getRedisClient();
-
-    // Get multiple values in a single operation
     const [amount, history] = await Promise.all([
       client.get("jarAmount"),
-      client.lRange("jarHistory", 0, 4), // Get last 5 entries
+      client.lRange("jarHistory", 0, 4),
     ]);
 
     return NextResponse.json({
@@ -31,22 +29,15 @@ export async function POST(request: Request) {
     const { action } = await request.json();
 
     if (action === "add") {
-      // Start a transaction
       const multi = client.multi();
-
-      // Increment amount
       multi.incrBy("jarAmount", 1);
 
-      // Add to history
       const newEntry = `${new Date().toLocaleTimeString()}: Added $1 to the jar`;
       multi.lPush("jarHistory", newEntry);
-      // Trim history to keep only last 5 entries
       multi.lTrim("jarHistory", 0, 4);
 
-      // Execute transaction
-      const results = await multi.exec();
+      await multi.exec();
 
-      // Get updated state
       const [newAmount, history] = await Promise.all([
         client.get("jarAmount"),
         client.lRange("jarHistory", 0, 4),
@@ -60,11 +51,8 @@ export async function POST(request: Request) {
 
     if (action === "reset") {
       const multi = client.multi();
-
-      // Reset amount
       multi.set("jarAmount", "0");
 
-      // Reset history
       const resetEntry = `${new Date().toLocaleTimeString()}: Jar was reset to $0`;
       multi.del("jarHistory");
       multi.lPush("jarHistory", resetEntry);
