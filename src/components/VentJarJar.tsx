@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from "react";
+// /src/components/VentJar.tsx
+
+import React, { useState, useMemo, useEffect } from "react";
 import { Coins, RotateCcw, History } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -7,6 +9,7 @@ export const VentJar: React.FC = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [recentVents, setRecentVents] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showFinalConfirm, setShowFinalConfirm] = useState(false);
 
@@ -38,33 +41,65 @@ export const VentJar: React.FC = () => {
   const visibleCoins = Math.floor(amount);
   const percentFull = (amount / MAX_AMOUNT) * 100;
 
-  const handleVent = () => {
-    if (amount < MAX_AMOUNT) {
-      setAmount((prev) => Math.min(prev + 1, MAX_AMOUNT));
-      setIsShaking(true);
-      const now = new Date().toLocaleTimeString();
-      setRecentVents((prev) =>
-        [`${now}: Added $1 to the jar`, ...prev].slice(0, 5)
-      );
-      setTimeout(() => setIsShaking(false), 500);
+  useEffect(() => {
+    fetchJarState();
+  }, []);
+
+  const fetchJarState = async () => {
+    try {
+      const response = await fetch("/api/jar");
+      const data = await response.json();
+      setAmount(data.amount);
+      setRecentVents(data.history);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch jar state:", error);
+      setIsLoading(false);
     }
   };
 
-  const handleResetClick = () => {
-    setShowResetConfirm(true);
+  const handleVent = async () => {
+    if (amount < MAX_AMOUNT) {
+      setIsShaking(true);
+      try {
+        const response = await fetch("/api/jar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "add" }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update jar");
+        }
+
+        const data = await response.json();
+        setAmount(data.amount);
+        setRecentVents(data.history);
+      } catch (error) {
+        console.error("Failed to update jar:", error);
+        // Optionally show an error message to the user
+        alert("Failed to add to jar. Please try again.");
+      } finally {
+        setTimeout(() => setIsShaking(false), 500);
+      }
+    }
   };
 
-  const handleFirstConfirm = () => {
-    setShowFinalConfirm(true);
-  };
-
-  const handleFinalConfirm = () => {
-    setAmount(0);
-    setRecentVents([]);
-    setShowResetConfirm(false);
-    setShowFinalConfirm(false);
-    const now = new Date().toLocaleTimeString();
-    setRecentVents([`${now}: Jar was reset to $0`]);
+  const handleFinalConfirm = async () => {
+    try {
+      const response = await fetch("/api/jar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reset" }),
+      });
+      const data = await response.json();
+      setAmount(data.amount);
+      setRecentVents(data.history);
+      setShowResetConfirm(false);
+      setShowFinalConfirm(false);
+    } catch (error) {
+      console.error("Failed to reset jar:", error);
+    }
   };
 
   const cancelReset = () => {
@@ -82,7 +117,9 @@ export const VentJar: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Jar Container */}
-          <div className={`relative mx-auto ${isShaking ? "animate-shake" : ""}`}>
+          <div
+            className={`relative mx-auto ${isShaking ? "animate-shake" : ""}`}
+          >
             {/* Lid */}
             <div className="absolute left-1/2 transform -translate-x-1/2 -top-4 w-56 h-8 bg-gradient-to-b from-gray-100 to-gray-200 rounded-t-2xl shadow-md z-10">
               {/* Simple Threading Pattern */}
@@ -125,7 +162,9 @@ export const VentJar: React.FC = () => {
                     >
                       <div className="w-full h-full bg-yellow-400 rounded-full shadow-lg flex items-center justify-center rotate-12">
                         <div className="w-10 h-10 bg-yellow-300 rounded-full flex items-center justify-center">
-                          <span className="text-yellow-600 text-xs font-bold">$1</span>
+                          <span className="text-yellow-600 text-xs font-bold">
+                            $1
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -182,7 +221,7 @@ export const VentJar: React.FC = () => {
             </button>
 
             <button
-              onClick={handleResetClick}
+              onClick={() => setShowResetConfirm(true)}
               className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-xl transition-colors"
             >
               <RotateCcw className="w-5 h-5" />
@@ -225,7 +264,7 @@ export const VentJar: React.FC = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleFirstConfirm}
+                    onClick={handleFinalConfirm}
                     className="px-5 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
                   >
                     Yes, Continue
